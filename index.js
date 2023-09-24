@@ -1,3 +1,6 @@
+const WINDOW_WIDTH = 300;
+const WINDOW_HEIGHT = 600;
+
 const createReact = (x, y, w, h) => {
   const position = { x, y };
   const dimensions = { w, h };
@@ -107,15 +110,50 @@ const createBrick = (x, y, w = 50, h = 12.5, life = 1) => {
   };
 };
 
+const createLayout = () => {
+  const layout = [
+    ["#", "#", "#", "#", "#", "#"],
+    ["#", "#", "#", "#", "#", "#"],
+    [" ", "#", " ", "#", " ", "#"],
+    ["#", "#", " ", "#", " ", "#"],
+    ["#", " ", "#", "#", "#", "#"],
+  ];
+  const BRICK_WIDTH = WINDOW_WIDTH / layout[0].length;
+  const BRICK_HEIGHT = 12.5;
+
+  function getBricks() {
+    const bricks = [];
+
+    for ([rowNumber, row] of layout.entries()) {
+      for ([colNumber, col] of row.entries()) {
+        if (col != "#") continue;
+
+        const brickX = colNumber * BRICK_WIDTH;
+        const brickY = rowNumber * BRICK_HEIGHT;
+
+        const newBrick = createBrick(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
+        bricks.push(newBrick);
+      }
+    }
+
+    return bricks;
+  }
+
+  return {
+    getBricks,
+  };
+};
+
 const createGame = () => {
   const paddle = createPaddle(150, 400);
-  const bricks = [];
+  const bricks = createLayout().getBricks();
 
   function render(ctx) {
     // Render paddle
     paddle.render(ctx);
     // Render Ball
-    // Render Briks
+    // Render Bricks
+    bricks.forEach((brick) => brick.render(ctx));
   }
 
   function update() {}
@@ -128,8 +166,8 @@ const createGame = () => {
 
 const canvas = document.querySelector("#gameScreen");
 const context = canvas.getContext("2d");
-canvas.width = 300;
-canvas.height = 600;
+canvas.width = WINDOW_WIDTH;
+canvas.height = WINDOW_HEIGHT;
 
 let game = createGame();
 game.render(context);
