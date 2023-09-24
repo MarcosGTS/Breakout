@@ -1,101 +1,129 @@
 const createReact = (x, y, w, h) => {
-    const position = { x, y };
-    const dimensions = { w, h };
-    
-    function getInfo() {
-        const { x, y } = position;
-        const { w, h } = dimensions;
+  const position = { x, y };
+  const dimensions = { w, h };
 
-        return { x, y, w, h };
-    }
-    
-    function getLeft() {
-        return x;
-    }
+  function getInfo() {
+    const { x, y } = position;
+    const { w, h } = dimensions;
 
-    function getRight() {
-        return x + w;
-    }
+    return { x, y, w, h };
+  }
 
-    function getTop() {
-        return y;
-    }
+  function getLeft() {
+    return x;
+  }
 
-    function getBottom() {
-        return y + h;
-    }
+  function getRight() {
+    return x + w;
+  }
 
-    function checkRectCollision(rect) {
-        return (getLeft() < rect.getRight() &&
-                getRigth() > rect.getLeft() &&
-                getTop() < rect.getBottom() &&
-                getBottom > rect.getTop());
-    }
+  function getTop() {
+    return y;
+  }
 
-    function setX(newX) {
-        position.x = newX;
-    }
+  function getBottom() {
+    return y + h;
+  }
 
-    function setY(newY) {
-        position.y = newY;
-    }
+  function checkRectCollision(rect) {
+    return (
+      getLeft() < rect.getRight() &&
+      getRight() > rect.getLeft() &&
+      getTop() < rect.getBottom() &&
+      getBottom > rect.getTop()
+    );
+  }
 
-    function render(ctx) {
-        const {x, y, w, h} = getInfo();
-        ctx.fillRect(x, y, w, h);
-    }
+  function setX(newX) {
+    position.x = newX;
+  }
 
-    return {
-        setX,
-        setY,
-        getLeft,
-        getRight,
-        getTop,
-        getBottom,
-        checkRectCollision,
-        render,
-    };
+  function setY(newY) {
+    position.y = newY;
+  }
+
+  function render(ctx) {
+    const { x, y, w, h } = getInfo();
+    ctx.fillRect(x, y, w, h);
+  }
+
+  return {
+    setX,
+    setY,
+    getLeft,
+    getRight,
+    getTop,
+    getBottom,
+    checkRectCollision,
+    render,
+  };
 };
 
 const createPaddle = (x, y, w = 50, h = 12.5) => {
-    const rect = createReact(x, y, w, h); 
-    const velocity = 10;
+  const rect = createReact(x, y, w, h);
+  const velocity = 10;
 
-    function render(ctx) {
-        rect.render(ctx);
-    }
+  function render(ctx) {
+    rect.render(ctx);
+  }
 
-    function getRect() {
-        return rect; 
-    }
+  function getRect() {
+    return rect;
+  }
 
-    function getCollision(rectBody) {
-        return rect.checkRectCollision(rectBody);    
-    };
+  function getCollision(rectBody) {
+    return rect.checkRectCollision(rectBody);
+  }
 
-    return {
-        render,
-        getCollision,
-    }
+  return {
+    render,
+    getCollision,
+  };
+};
+
+const createBrick = (x, y, w = 50, h = 12.5, life = 1) => {
+  const rect = createReact(x, y, w, h);
+
+  function checkContact(body) {
+    if (getCollision(body)) life--;
+  }
+
+  function getCollision(rectBody) {
+    return rect.checkRectCollision(rectBody);
+  }
+
+  function isBreak() {
+    return life <= 0;
+  }
+
+  function render(ctx) {
+    rect.render(ctx);
+  }
+
+  return {
+    checkContact,
+    isBreak,
+    render,
+  };
 };
 
 const createGame = () => {
-    const paddle = createPaddle(150, 400); 
-    const bricks = []; 
+  const paddle = createPaddle(150, 400);
+  const bricks = [];
 
-    function render(ctx) {
-        // Render paddle
-        paddle.render(ctx);
-        // Render Ball
-        // Render Briks
-    };
+  function render(ctx) {
+    // Render paddle
+    paddle.render(ctx);
+    // Render Ball
+    // Render Briks
+  }
 
-    function update() {};
-    
-    return {
-        render,
-        update,
-    };
+  function update() {}
+
+  return {
+    render,
+    update,
+  };
 };
 
 const canvas = document.querySelector("#gameScreen");
