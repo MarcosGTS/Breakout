@@ -1,5 +1,5 @@
-const WINDOW_WIDTH = 300;
-const WINDOW_HEIGHT = 600;
+const WINDOW_WIDTH = 250;
+const WINDOW_HEIGHT = 500;
 
 const createReact = (x, y, w, h) => {
   const position = { x, y };
@@ -13,19 +13,19 @@ const createReact = (x, y, w, h) => {
   }
 
   function getLeft() {
-    return x;
+    return position.x;
   }
 
   function getRight() {
-    return x + w;
+    return position.x + position.w;
   }
 
   function getTop() {
-    return y;
+    return position.y;
   }
 
   function getBottom() {
-    return y + h;
+    return position.y + position.h;
   }
 
   function checkRectCollision(rect) {
@@ -78,9 +78,16 @@ const createPaddle = (x, y, w = 50, h = 12.5) => {
     return rect.checkRectCollision(rectBody);
   }
 
+  function move(direction) {
+    const newPosition = rect.getLeft() + direction * velocity;
+    rect.setX(newPosition);
+  }
+
   return {
     render,
     getCollision,
+    getRect,
+    move,
   };
 };
 
@@ -119,7 +126,7 @@ const createLayout = () => {
     ["#", " ", "#", "#", "#", "#"],
   ];
   const BRICK_WIDTH = WINDOW_WIDTH / layout[0].length;
-  const BRICK_HEIGHT = 12.5;
+  const BRICK_HEIGHT = BRICK_WIDTH / 2.5;
 
   function getBricks() {
     const bricks = [];
@@ -144,11 +151,14 @@ const createLayout = () => {
   };
 };
 
-const createGame = () => {
+const createGame = (ctx) => {
   const paddle = createPaddle(150, 400);
   const bricks = createLayout().getBricks();
 
-  function render(ctx) {
+  document.addEventListener("keydown", handleInput);
+
+  function render() {
+    ctx.clearRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     // Render paddle
     paddle.render(ctx);
     // Render Ball
@@ -157,6 +167,16 @@ const createGame = () => {
   }
 
   function update() {}
+
+  function handleInput(e) {
+    const behaviors = {
+      a: () => paddle.move(-1),
+      d: () => paddle.move(1),
+    };
+
+    if (behaviors[e.key]) behaviors[e.key]();
+    render();
+  }
 
   return {
     render,
@@ -169,5 +189,5 @@ const context = canvas.getContext("2d");
 canvas.width = WINDOW_WIDTH;
 canvas.height = WINDOW_HEIGHT;
 
-let game = createGame();
-game.render(context);
+let game = createGame(context);
+game.render();
